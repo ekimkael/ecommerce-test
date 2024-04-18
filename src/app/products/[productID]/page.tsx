@@ -58,11 +58,13 @@ export default function ProductID({ params }: Props) {
 										className={`group flex h-full w-full items-center justify-center overflow-hidden rounded-lg border bg-white ${
 											selectedImage === image ? "border-primary" : ""
 										} hover:border-primary`}>
-										<img
-											alt="Acme Baby Onesie - baby-onesie-beige-1"
-											loading="lazy"
-											src={image}
-										/>
+										<picture>
+											<img
+												alt="Acme Baby Onesie - baby-onesie-beige-1"
+												loading="lazy"
+												src={image}
+											/>
+										</picture>
 									</div>
 								</Link>
 							</li>

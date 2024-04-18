@@ -1,27 +1,38 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { Suspense, useEffect, useState } from "react"
 
 import store from "@/store"
 import { APIResponse } from "./types"
-import { Label } from "@/components/ui/label"
+import Categories from "./categories"
+import Spinner from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, Card } from "@/components/ui/card"
 
 export default function Products() {
+	const searchParams = useSearchParams()
+	const category = searchParams.get("category")
+
+	const [isLoading, setIsLoading] = useState(false)
 	const [products, setProducts] = useState<APIResponse | null>(null)
 
 	useEffect(() => {
-		fetch("https://dummyjson.com/products")
-			.then((response) => response.json())
-			.then((data: APIResponse) => setProducts(data))
-	}, [])
+		setIsLoading((old) => !old)
+		const prefixURL = "https://dummyjson.com/products"
+		const URL = category ? prefixURL + `/category/${category}` : prefixURL
 
-	// console.log(products)
+		fetch(URL)
+			.then((response) => response.json())
+			.then((data: APIResponse) => {
+				setProducts(data)
+				setIsLoading((old) => !old)
+			})
+	}, [category])
 
 	return (
-		<main className="container">
+		<main className="container min-h-screen px-4 py-8">
 			<div className="grid gap-2">
 				<h1 className="font-bold text-3xl">All Products</h1>
 				<p className="text-gray-500 dark:text-gray-400">
@@ -29,32 +40,11 @@ export default function Products() {
 				</p>
 			</div>
 
-			<section className="my-8">
-				<ul className="flex items-center gap-2.5 flex-wrap">
-					<Label
-						className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800"
-						htmlFor="electronics">
-						Electronics
-					</Label>
-					<Label
-						className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800"
-						htmlFor="fashion">
-						Fashion
-					</Label>
-					<Label
-						className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800"
-						htmlFor="home-decor">
-						Home Decor
-					</Label>
-					<Label
-						className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-gray-100 dark:[&:has(:checked)]:bg-gray-800"
-						htmlFor="kitchenware">
-						Kitchenware
-					</Label>
-				</ul>
-			</section>
+			<Suspense fallback={<span>loading...</span>}>
+				<Categories selected={category} />
+			</Suspense>
 
-			{!!products ? (
+			{!!products && !isLoading ? (
 				<ul className="grid grid-cols-4 gap-4">
 					{products.products.map((item) => (
 						<li key={item.id}>
@@ -101,7 +91,11 @@ export default function Products() {
 						</li>
 					))}
 				</ul>
-			) : null}
+			) : (
+				<div className="w-full flex items-center justify-center">
+					<Spinner />
+				</div>
+			)}
 		</main>
 	)
 }
