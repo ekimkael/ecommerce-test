@@ -85,6 +85,11 @@ const Navbar = (props: Props) => {
 				</button>
 
 				<div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+					<Link
+						className="transition-colors hover:text-foreground/80 text-foreground/60"
+						href="/auth/signin">
+						Signin
+					</Link>
 					<div className="w-full flex-1 md:w-auto md:flex-none">
 						<Sheet>
 							<SheetTrigger asChild>
