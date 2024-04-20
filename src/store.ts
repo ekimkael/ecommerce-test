@@ -1,10 +1,9 @@
 import { Product } from "./app/products/types"
-
-interface CartItem extends Product {
-	quantity: number
-}
+import { CartItem, Credentials, User } from "./utils/types"
 
 let cart: CartItem[] = []
+let user: User | null = null
+let token = localStorage.getItem("token") || null
 let subscribers: Set<() => void> = new Set()
 
 const store = {
@@ -77,6 +76,56 @@ const store = {
 
 	getTotalItemsCount: (): number => {
 		return cart.reduce((total, item) => total + item.quantity, 0)
+	},
+
+	getTotalAmount: (): number => {
+		return cart.reduce((total, item) => total + item.price * item.quantity, 0)
+	},
+
+	// Authentication section
+	getToken: () => token,
+
+	getUser: () => {
+		const payload = localStorage.getItem("user")
+		if (payload && !user) {
+			const decoded = window.atob(payload)
+			const data = JSON.parse(decoded)
+			user = data
+			return user
+		}
+
+		if (user) return user
+
+		return null
+	},
+
+	signin: ({ username, password }: Credentials) => {
+		fetch("https://dummyjson.com/auth/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username, password }),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				const payload = window.btoa(JSON.stringify(data))
+				localStorage.setItem("token", data.token)
+				localStorage.setItem("user", payload)
+				token = data.token
+				user = data
+
+				subscribers.forEach((callback) => callback())
+			})
+			.catch((error) => {
+				throw new Error("Nom d'utilisateur ou mot de passe incorrect")
+			})
+	},
+
+	signout: () => {
+		localStorage.removeItem("token")
+		localStorage.removeItem("user")
+		token = null
+		user = null
+		subscribers.forEach((callback) => callback())
 	},
 }
 
