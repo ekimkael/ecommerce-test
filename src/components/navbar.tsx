@@ -27,6 +27,12 @@ const Navbar = (props: Props) => {
 		store.getServerSnapshot
 	)
 
+	const user = useSyncExternalStore(
+		store.subscribe,
+		store.getUser,
+		store.getUser
+	)
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex h-14 max-w-screen-2xl items-center">
@@ -41,11 +47,6 @@ const Navbar = (props: Props) => {
 							href="/products">
 							Products
 						</Link>
-						{/* <Link
-							className="transition-colors hover:text-foreground/80 text-foreground"
-							href="/docs/components">
-							Components
-						</Link> */}
 					</nav>
 				</div>
 
@@ -85,91 +86,109 @@ const Navbar = (props: Props) => {
 				</button>
 
 				<div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-					<Link
-						className="transition-colors hover:text-foreground/80 text-foreground/60"
-						href="/auth/signin">
-						Signin
-					</Link>
 					<div className="w-full flex-1 md:w-auto md:flex-none">
 						<Sheet>
 							<SheetTrigger asChild>
 								<Button
 									variant="outline"
-									size="icon"
-									disabled={cart.length === 0}>
+									disabled={cart.length === 0}
+									size={cart.length > 0 ? "default" : "icon"}>
 									<ShoppingBag />
 									<span>
 										{cart.length > 0 ? store.getTotalItemsCount() : null}
 									</span>
 								</Button>
 							</SheetTrigger>
-							<SheetContent side="right">
+							<SheetContent>
 								<SheetHeader>
 									<SheetTitle>Cart</SheetTitle>
-									<SheetDescription asChild>
-										<ul className="grid gap-4">
-											{cart.map((product) => (
-												<li key={product.id} className="flex justify-between">
-													<section className="flex items-center gap-2">
-														<div className="w-12 h-auto">
-															<picture>
-																<img
-																	className="object-cover"
-																	src={product.thumbnail}
-																	alt={product.title}
-																/>
-															</picture>
-														</div>
+								</SheetHeader>
 
-														<div className="grid">
-															<span className="line-clamp-1">
-																{product.title}
-															</span>
-															<small>${product.price}</small>
-														</div>
-													</section>
+								<section className="my-4">
+									<ul className="grid gap-4">
+										{cart.map((product) => (
+											<li key={product.id} className="flex justify-between">
+												<section className="flex items-center gap-2">
+													<div className="w-12 h-auto">
+														<picture>
+															<img
+																className="object-cover"
+																src={product.thumbnail}
+																alt={product.title}
+															/>
+														</picture>
+													</div>
 
-													<section className="flex items-center gap-2">
-														<div className="flex h-9 flex-row items-center rounded-full border border-neutral-200 overflow-hidden">
-															<Button
-																size="icon"
-																variant="ghost"
-																className="hover:bg-transparent"
-																onClick={() => store.decrement(product.id)}>
-																<Minus className="h-4 w-4 hover:stroke-2" />
-															</Button>
-															<p className="w-6 text-center">
-																<span className="w-full text-sm">
-																	{product.quantity}
-																</span>
-															</p>
-															<Button
-																variant="ghost"
-																size="icon"
-																className="hover:bg-transparent"
-																onClick={() => store.increment(product.id)}>
-																<Plus className="h-4 w-4 hover:stroke-2" />
-															</Button>
-														</div>
+													<div className="grid">
+														<span className="line-clamp-1">
+															{product.title}
+														</span>
+														<small>${product.price}</small>
+													</div>
+												</section>
 
+												<section className="flex items-center gap-2">
+													<div className="flex h-9 flex-row items-center rounded-full border border-neutral-200 overflow-hidden">
 														<Button
 															size="icon"
-															variant="destructive"
-															className="rounded-full"
-															onClick={() =>
-																store.removeItemFromCart(product.id)
-															}>
-															<Trash className="h-4 w-4 hover:stroke-2" />
+															variant="ghost"
+															className="hover:bg-transparent"
+															onClick={() => store.decrement(product.id)}>
+															<Minus className="h-4 w-4 hover:stroke-2" />
 														</Button>
-													</section>
-												</li>
-											))}
-										</ul>
-									</SheetDescription>
-								</SheetHeader>
+														<p className="w-6 text-center">
+															<span className="w-full text-sm">
+																{product.quantity}
+															</span>
+														</p>
+														<Button
+															variant="ghost"
+															size="icon"
+															className="hover:bg-transparent"
+															onClick={() => store.increment(product.id)}>
+															<Plus className="h-4 w-4 hover:stroke-2" />
+														</Button>
+													</div>
+
+													<Button
+														size="icon"
+														variant="destructive"
+														className="rounded-full"
+														onClick={() =>
+															store.removeItemFromCart(product.id)
+														}>
+														<Trash className="h-4 w-4 hover:stroke-2" />
+													</Button>
+												</section>
+											</li>
+										))}
+									</ul>
+
+									<div className="py-4">
+										<div className="flex items-center justify-between border-t border-neutral-200 py-1">
+											<small className="text-neutral-500">Net to pay</small>
+											<p className="text-right text-base">
+												${store.getTotalAmount()}
+												<span className="ml-1 inline">USD</span>
+											</p>
+										</div>
+									</div>
+								</section>
 							</SheetContent>
 						</Sheet>
 					</div>
+
+					{user ? (
+						<Button onClick={() => store.signout()}>
+							logout: {user.lastName}
+						</Button>
+					) : (
+						<Link
+							className="transition-colors hover:text-foreground/80 text-foreground/60"
+							href="/auth/signin">
+							Signin
+						</Link>
+					)}
 				</div>
 			</div>
 		</header>

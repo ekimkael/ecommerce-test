@@ -1,15 +1,16 @@
 "use client"
 
 import Link from "next/link"
+import dynamic from "next/dynamic"
+import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
 
 import store from "@/store"
 import { APIResponse } from "./types"
-import Categories from "./categories"
 import Spinner from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, Card } from "@/components/ui/card"
+const Categories = dynamic(() => import("./categories"), { ssr: false })
 
 export default function Products() {
 	const searchParams = useSearchParams()
@@ -40,9 +41,7 @@ export default function Products() {
 				</p>
 			</div>
 
-			<Suspense fallback={<span>loading...</span>}>
-				<Categories selected={category} />
-			</Suspense>
+			<Categories selected={category} />
 
 			{!!products && !isLoading ? (
 				<ul className="grid grid-cols-4 gap-4">
