@@ -3,8 +3,12 @@ import { CartItem, Credentials, User } from "./utils/types"
 
 let cart: CartItem[] = []
 let user: User | null = null
-let token = localStorage.getItem("token") || null
+let token: string | null = null
 let subscribers: Set<() => void> = new Set()
+
+if (typeof window !== "undefined") {
+	token = localStorage.getItem("token") || null
+}
 
 const store = {
 	getCart: () => cart,
