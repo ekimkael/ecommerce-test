@@ -1,22 +1,22 @@
 "use client"
 
 import Link from "next/link"
-import React, { useSyncExternalStore } from "react"
+import React, { Suspense, useSyncExternalStore } from "react"
 
 import {
 	Sheet,
 	SheetContent,
-	SheetDescription,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
 } from "./ui/sheet"
 import store from "@/store"
 import { Button } from "./ui/button"
-import ShoppingBag from "./icons/shopping-bag"
-import Minus from "./icons/minus"
+
 import Plus from "./icons/plus"
+import Minus from "./icons/minus"
 import Trash from "./icons/trash"
+import ShoppingBag from "./icons/shopping-bag"
 
 interface Props {}
 
@@ -179,9 +179,11 @@ const Navbar = (props: Props) => {
 					</div>
 
 					{user ? (
-						<Button onClick={() => store.signout()}>
-							logout: {user.lastName}
-						</Button>
+						<Suspense>
+							<Button onClick={() => store.signout()}>
+								logout: {user.lastName}
+							</Button>
+						</Suspense>
 					) : (
 						<Link
 							className="transition-colors hover:text-foreground/80 text-foreground/60"

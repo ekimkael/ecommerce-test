@@ -3,7 +3,6 @@
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
 
 import store from "@/store"
 import Spinner from "@/components/spinner"
@@ -16,30 +15,25 @@ const Categories = dynamic(() => import("./products/categories"), {
 })
 
 export default function Home() {
-	const searchParams = useSearchParams()
-	const category = searchParams.get("category")
-
 	const [isLoading, setIsLoading] = useState(false)
 	const [products, setProducts] = useState<APIResponse | null>(null)
 
 	useEffect(() => {
 		setIsLoading((old) => !old)
-		const prefixURL = "https://dummyjson.com/products"
-		const URL = category ? prefixURL + `/category/${category}` : prefixURL
 
-		fetch(URL)
+		fetch("https://dummyjson.com/products")
 			.then((response) => response.json())
 			.then((data: APIResponse) => {
 				setProducts(data)
 				setIsLoading((old) => !old)
 			})
-	}, [category])
+	}, [])
 
 	return (
 		<main className="container min-h-screen px-4 py-8">
 			<CategoryTops />
 
-			<Categories selected={category} />
+			<Categories selected={null} />
 
 			{!!products && !isLoading ? (
 				<ul className="grid grid-cols-4 gap-4">

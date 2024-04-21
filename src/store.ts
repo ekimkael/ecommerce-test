@@ -90,12 +90,15 @@ const store = {
 	getToken: () => token,
 
 	getUser: () => {
-		const payload = localStorage.getItem("user")
-		if (payload && !user) {
-			const decoded = window.atob(payload)
-			const data = JSON.parse(decoded)
-			user = data
-			return user
+		if (typeof window !== "undefined") {
+			// token = localStorage.getItem("token") || null
+			const payload = localStorage.getItem("user")
+			if (payload && !user) {
+				const decoded = window.atob(payload)
+				const data = JSON.parse(decoded)
+				user = data
+				return user
+			}
 		}
 
 		if (user) return user
